@@ -66,23 +66,14 @@ sList lista = (show (head lista)) ++ "  " ++ sList (tail lista)
 
 instance Show Board where
     show (Board jucatorCurent jucator1 jucator2) = "  " ++ sList (fst jucator2) ++ "\n" 
-    											   	    ++ (show (snd jucator2)) 
-    								   	    			++ "                  " 
-    								        			++ (show (snd jucator1)) ++ "    " 
-    								        			++ "Next: " ++ (show jucatorCurent) ++ ", "
-    								        			++ "Playing, " ++ "Score: " ++ "(" 
-    								        			++ (show (snd jucator1)) ++ ","
-    								        			++ (show (snd jucator2)) ++ ")" ++ "\n"	
-    								        			++ "  " ++ sList (fst jucator1)
-
-{-
-    *** TODO BONUS ***
-
-    Instanțiați clasa 'Consecutive', pentru a putea determina dacă în două
-    configurații ale tablei trebuie să mute același jucător.
--}
-instance Consecutive Board where
-    b1 >< b2 = undefined
+    					         	++ (show (snd jucator2)) 
+    			   	    			++ "                  " 
+    				     			++ (show (snd jucator1)) ++ "    " 
+    				    			++ "Next: " ++ (show jucatorCurent) ++ ", "
+    				     			++ "Playing, " ++ "Score: " ++ "(" 
+    			        			++ (show (snd jucator1)) ++ ","
+    			        			++ (show (snd jucator2)) ++ ")" ++ "\n"	
+    				    			++ "  " ++ sList (fst jucator1)
 
 {-
     *** TODO ***
@@ -172,31 +163,30 @@ changeSYou a seminte pCurent board
 	| pCurent == 6 = board
 	-- pune seminte pana la ultima
 	| pCurent > a && seminte > 1 = let lista = (fst (yourSeeds board));
-														   x = lista !! pCurent;
-														   lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista;
-														   b = build (lNew, (snd (yourSeeds board))) (oppsSeeds board) Opponent
-														   in changeSYou a (seminte - 1) (pCurent + 1) b
+					   x = lista !! pCurent;
+					   lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista;
+					   b = build (lNew, (snd (yourSeeds board))) (oppsSeeds board) Opponent										   in changeSYou a (seminte - 1) (pCurent + 1) b
 	-- verifica pentru ultima seminta valoare din tabela opusa
 	| pCurent > a && seminte == 1 = let you = (fst (yourSeeds board));
-										opp = (fst (oppsSeeds board));
-										x = you !! pCurent;
-									    y = opp !! pCurent;
-							-- daca ultima saminta pica pe o casuta = 0 se uita cate seminte sunt in casuta adversa
-										jucator1 = if x == 0 && y /= 0 then ((setOnZero pCurent you),(snd (yourSeeds board)) + 1 + y) 
-													else  (take pCurent you ++ [x + 1] ++ drop (pCurent + 1 ) you,(snd (yourSeeds board))) ;
-										jucator2 = if x == 0 && y /= 0 then (setOnZero pCurent opp, (snd (oppsSeeds board))) else (oppsSeeds board) 
-											in build jucator1 jucator2 Opponent 
+					    opp = (fst (oppsSeeds board));
+					    x = you !! pCurent;
+					    y = opp !! pCurent;
+	-- daca ultima saminta pica pe o casuta = 0 se uita cate seminte sunt in casuta adversa
+					    jucator1 = if x == 0 && y /= 0 then ((setOnZero pCurent you),(snd (yourSeeds board)) + 1 + y) 
+					               else  (take pCurent you ++ [x + 1] ++ drop (pCurent + 1 ) you,(snd (yourSeeds board))) ;
+					    jucator2 = if x == 0 && y /= 0 then (setOnZero pCurent opp, (snd (oppsSeeds board))) else (oppsSeeds board)
+					    in build jucator1 jucator2 Opponent 
 	| otherwise = changeSYou a seminte (pCurent + 1) board														   
 
 {-
-	Modifice lista oponentului in functie de numarul de seminte dat
+	Modifica lista oponentului in functie de numarul de seminte dat
 -}
 changeOp :: House -> House -> [House] -> [House]
 changeOp seminte pCurent lista
 	| pCurent < 0 = lista
 	| pCurent >= 0 && seminte > 0 = let x = lista !! pCurent;
-									   lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
-									   in changeOp (seminte - 1) (pCurent - 1) lNew
+					    lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
+					in changeOp (seminte - 1) (pCurent - 1) lNew
 	| otherwise = changeOp seminte (pCurent - 1) lista								   
 
 {-
@@ -210,21 +200,21 @@ myTurn :: House -> House -> House -> Board -> Board
 myTurn c a seminte board
 	| c == 0 && (a + seminte) < 6 = changeSYou a seminte 0 board
 	| c == 0 && (a + seminte) == 6 = let lista = (fst (yourSeeds board) , (snd (yourSeeds board)) + 1);
-										  b = changeSYou a seminte 0 (build lista (oppsSeeds board) Opponent)
-										  -- daca ultima samanta pica in depozit se pastreaza randul jucatorului curent
-										  in build (yourSeeds b) (oppsSeeds b) You
+					 b = changeSYou a seminte 0 (build lista (oppsSeeds board) Opponent
+	-- daca ultima samanta pica in depozit se pastreaza randul jucatorului curent
+					 in build (yourSeeds b) (oppsSeeds b) You
 	-- daca numarul de seminte este mai mare decat lungimea listei se prelucreaza si se apeleaza recursiv pentru lista oponentului
 	| c == 0 && (a + seminte) > 6 = let lista = (fst (yourSeeds board) , (snd (yourSeeds board)) + 1);
-										b = changeSYou a seminte 0 (build lista (oppsSeeds board) Opponent)
-										in myTurn 1 (0 - 1) (seminte - (6 - a ) ) b
+				            b = changeSYou a seminte 0 (build lista (oppsSeeds board) Opponent)
+					in myTurn 1 (0 - 1) (seminte - (6 - a ) ) b
 	| c == 1 && seminte <= 6 = let lista = changeOp seminte 5 (fst (oppsSeeds board))
-									in build (yourSeeds board) (lista ,(snd (oppsSeeds board))) Opponent
+			           in build (yourSeeds board) (lista ,(snd (oppsSeeds board))) Opponent
 	-- daca numarul de seminte este mai mare decat lista curenta se prelucreaza si se apleaza recursiv pentru lista You
 	-- cu pozitia -1 pentru a se incepe de la 0
 	| c == 1 && seminte > 6 = let lista = changeOp seminte 5 (fst (oppsSeeds board));
-								  b = build (yourSeeds board) (lista ,(snd (oppsSeeds board))) Opponent
-								  -- (0 - 1) - cand se intoarce la lista jucatorui curent sa completeze cu seminte de la pozitia 0
-								  in myTurn 0 (0 - 1) (seminte - 6) b
+				      b = build (yourSeeds board) (lista ,(snd (oppsSeeds board))) Opponent
+	-- (0 - 1) - cand se intoarce la lista jucatorui curent sa completeze cu seminte de la pozitia 0
+				  in myTurn 0 (0 - 1) (seminte - 6) b
 	| otherwise = board 
 
 {-
@@ -236,20 +226,20 @@ changeSOpp a seminte pCurent board
 	| pCurent < 0 = board
 	-- daca nu s-a ajuns la ultima seminta 
 	| pCurent < a && seminte > 1 = let lista = (fst (oppsSeeds board));
-										x = lista !! pCurent;
-										lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
-										in changeSOpp a (seminte - 1) (pCurent - 1) (build (yourSeeds board) (lNew , (snd (oppsSeeds board))) You)
+					   x = lista !! pCurent;
+					   lNew = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
+				       in changeSOpp a (seminte - 1) (pCurent - 1) (build (yourSeeds board) (lNew , (snd (oppsSeeds board))) You)
 	-- daca s-a ajuns la ultima seminta se vedifica casa unde urmaza sa fie pusa si casa adversarului
 	| pCurent < a && seminte == 1 = let you = (fst (oppsSeeds board));
-										opp = (fst (yourSeeds board));
-										x = you !! pCurent ;
-										y = opp !! pCurent ;
-										-- daca casa curenta e 0 se pune 0 pe pozitia data si se actualizeaza scorul
-										jucator1 = if x == 0 && y /= 0 then ((setOnZero pCurent you),(snd (oppsSeeds board)) + 1 + y) 
-													else  (take pCurent  you ++ [x + 1] ++ drop (pCurent + 1)  you,(snd (oppsSeeds board))); 
-										-- daca casa curenta e 0 se pune 0 pe accesi pozitie in casa adversarului			
-										jucator2 = if x == 0 && y /= 0 then (setOnZero pCurent opp, (snd (yourSeeds board))) else (yourSeeds board)
-										in build jucator2 jucator1 You 		
+				            opp = (fst (yourSeeds board));
+			    		    x = you !! pCurent ;
+					    y = opp !! pCurent ;
+        -- daca casa curenta e 0 se pune 0 pe pozitia data si se actualizeaza scorul
+					    jucator1 = if x == 0 && y /= 0 then ((setOnZero pCurent you),(snd (oppsSeeds board)) + 1 + y) 
+							else  (take pCurent  you ++ [x + 1] ++ drop (pCurent + 1)  you,(snd (oppsSeeds board))); 
+	-- daca casa curenta e 0 se pune 0 pe accesi pozitie in casa adversarului			
+					    jucator2 = if x == 0 && y /= 0 then (setOnZero pCurent opp, (snd (yourSeeds board))) else (yourSeeds board)
+					 in build jucator2 jucator1 You 		
 	| otherwise = changeSOpp a seminte (pCurent - 1) board									
 
 {-
@@ -259,8 +249,8 @@ changeYou :: House -> House -> [House] -> [House]
 changeYou seminte pCurent lista
 	| pCurent == (length lista) = lista
 	| seminte > 0 = let x = lista !! pCurent;
-					 l = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
-				     in changeYou (seminte - 1) (pCurent + 1) l
+			    l = take pCurent lista ++ [x + 1] ++ drop (pCurent + 1) lista
+			in changeYou (seminte - 1) (pCurent + 1) l
 	| otherwise = changeYou (seminte - 1) (pCurent + 1) lista
 
 {-
@@ -276,21 +266,21 @@ opTurn c a seminte board
 	| c == 1 && seminte < a + 1 = changeSOpp a seminte 5 board
 	-- daca ultima saminta pica in depozit jucatorul curent ramane tot Opponent
 	| c == 1  && seminte == (a + 1) = let lista = (fst (oppsSeeds board), (snd (oppsSeeds board)) + 1);
-													b = changeSOpp a seminte 5 (build (yourSeeds board) lista Opponent)
-													in build (yourSeeds b) (oppsSeeds b) Opponent
+					      b = changeSOpp a seminte 5 (build (yourSeeds board) lista Opponent)
+					  in build (yourSeeds b) (oppsSeeds b) Opponent
 	-- daca s-a ajuns in partea jucatorui Opponent dar numarul de seminte este mai mare decat ceea ce incape in tabela 
 	-- se prelucreaza si se apeleaza recursiv pentru tabla jucatorului You												
 	| c == 1 && seminte > ( a + 1 ) = let lista = (fst (oppsSeeds board), (snd (oppsSeeds board)) + 1);
-													b = changeSOpp a seminte 5 (build (yourSeeds board) lista Opponent)
-													in opTurn 0 6 (seminte - (a + 1)) b						
+					      b = changeSOpp a seminte 5 (build (yourSeeds board) lista Opponent)
+					  in opTurn 0 6 (seminte - (a + 1)) b						
 	-- daca s-a ajuns in partea jucatorului You se prelucrea tabela						
 	| c == 0 && seminte <= 6 = let lista = (changeYou seminte 0 (fst (yourSeeds board)) , (snd (yourSeeds board)) )
-									in build lista (oppsSeeds board) You	
+				   in build lista (oppsSeeds board) You	
 	-- daca s-a ajuns in partea jucatorului You dar numarul de seminte este mai mare decat lungimea tabelei se prelureaza si 
 	-- se apeleaza recursiv pentru parte jucatoruliu Opponent
 	| c == 0 && seminte > 6 = let lista = (changeYou seminte 0 (fst (yourSeeds board)) , (snd (yourSeeds board)) );
-								 b = build lista (oppsSeeds board) You	
-								 in opTurn 1 6 (seminte - 6) b																													
+				      b = build lista (oppsSeeds board) You	
+			          in opTurn 1 6 (seminte - 6) b																													
 	| otherwise = board
 
 move :: House -> Board -> Board
@@ -300,12 +290,12 @@ move a board
 	| a <= 0 = board
 	-- daca e randul jucatorului You
 	| a < 6 && a > 0 && who board == You  = let seminte = (fst (yourSeeds board)) !! (a - 1);
-												lista = (setOnZero (a - 1) (fst (yourSeeds board)) , (snd (yourSeeds board))) 
-				 				 				in myTurn 0 (a - 1) seminte (build lista (oppsSeeds board) You) 
+						    lista = (setOnZero (a - 1) (fst (yourSeeds board)) , (snd (yourSeeds board))) 
+				 		in myTurn 0 (a - 1) seminte (build lista (oppsSeeds board) You) 
 	-- daca e randul jucatorului Opponent
 	|a < 6 && a > 0 && who board == Opponent = let seminte = (fst (oppsSeeds board)) !! (a - 1);
-												   lista = (setOnZero (a - 1) (fst (oppsSeeds board)), snd (oppsSeeds board))
-								  				   in opTurn 1 (a - 1) seminte (build (yourSeeds board) lista Opponent)
+						       lista = (setOnZero (a - 1) (fst (oppsSeeds board)), snd (oppsSeeds board))
+						   in opTurn 1 (a - 1) seminte (build (yourSeeds board) lista Opponent)
 	| otherwise  = board
 
 {-
